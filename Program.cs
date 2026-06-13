@@ -10,7 +10,7 @@ namespace VideoRateScanList
     {
         private static void Main(string[] args)
         {
-            string outputDir = @"C:\Users\rammus\Downloads";
+            string outputDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
             Console.WriteLine($"输出目录: {outputDir}");
             Console.WriteLine();
 
@@ -349,17 +349,21 @@ namespace VideoRateScanList
         {
             switch (rateLevel.ToUpper())
             {
-                case "SSS":
                 case "SSS+":
+                    return "rate-sss-plus";
+                case "SSS":
                     return "rate-sss";
-                case "SS":
                 case "SS+":
+                    return "rate-ss-plus";
+                case "SS":
                     return "rate-ss";
-                case "S":
                 case "S+":
+                    return "rate-s-plus";
+                case "S":
                     return "rate-s";
-                case "A":
                 case "A+":
+                    return "rate-a-plus";
+                case "A":
                     return "rate-a";
                 default:
                     return "";
@@ -380,7 +384,7 @@ namespace VideoRateScanList
         /// </summary>
         private static string ExtractRateLevel(string ratePart)
         {
-            string[] validPatterns = { "SSS", "SS", "S", "A", "SSS+", "SS+", "S+", "A+" };
+            string[] validPatterns = { "SSS+", "SSS", "SS+", "SS", "S+", "S", "A+", "A" };
 
             foreach (string pattern in validPatterns)
             {
