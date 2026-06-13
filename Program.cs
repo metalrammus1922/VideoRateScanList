@@ -213,14 +213,14 @@ namespace VideoRateScanList
         {
             Dictionary<string, int> rateOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
             {
-                { "SSS", 1 },
-                { "SS", 2 },
-                { "S", 3 },
-                { "A", 4 },
                 { "SSS+", 1 },
-                { "SS+", 2 },
-                { "S+", 3 },
-                { "A+", 4 }
+                { "SSS", 2 },
+                { "SS+", 3 },
+                { "SS", 4 },
+                { "S+", 5 },
+                { "S", 6 },
+                { "A+", 7 },
+                { "A", 8 }
             };
 
             return files.OrderBy(item =>
@@ -313,9 +313,15 @@ namespace VideoRateScanList
                 }
 
                 string rateClass = GetRateCssClass(rateLevel);
-                string nameDisplay = isFolder
-                    ? $"{displayName}<span class=\"folder-badge\">文件夹</span>"
-                    : displayName;
+                string nameDisplay;
+                if (isFolder)
+                {
+                    nameDisplay = $"{displayName}<span class=\"folder-badge\">文件夹</span>";
+                }
+                else
+                {
+                    nameDisplay = displayName;
+                }
 
                 html.AppendLine("                <tr>");
                 html.AppendLine($"                    <td>{i + 1}</td>");
