@@ -26,6 +26,11 @@ namespace VideoRateScanList
             }
             Console.WriteLine();
 
+            Console.Write("请输入检索深度（直接回车表示全检索）: ");
+            string depthInput = Console.ReadLine();
+            int? maxDepth = string.IsNullOrWhiteSpace(depthInput) ? null : int.Parse(depthInput);
+            Console.WriteLine();
+
             foreach (var drive in drives)
             {
                 string driveLetter = drive.Name.TrimEnd('\\');
@@ -33,7 +38,7 @@ namespace VideoRateScanList
                 Console.WriteLine($"开始扫描 {driveLetter} 盘...");
                 Console.WriteLine($"========================================");
 
-                List<string> rateFiles = ScanRateVideoFiles(drive.Name);
+                List<string> rateFiles = ScanRateVideoFiles(drive.Name, maxDepth);
 
                 if (rateFiles.Count > 0)
                 {
@@ -74,13 +79,13 @@ namespace VideoRateScanList
         /// <summary>
         /// 扫描指定目录下所有视频文件，查找以rate开头的文件
         /// </summary>
-        private static List<string> ScanRateVideoFiles(string rootPath)
+        private static List<string> ScanRateVideoFiles(string rootPath, int? maxDepth)
         {
             List<string> rateFiles = new List<string>();
 
             try
             {
-                ScanDirectoryRecursively(rootPath, rateFiles);
+                ScanDirectoryRecursively(rootPath, rateFiles, currentDepth: 0, maxDepth: maxDepth);
             }
             catch (Exception ex)
             {
@@ -93,11 +98,13 @@ namespace VideoRateScanList
         /// <summary>
         /// 递归扫描目录，安全处理权限问题
         /// </summary>
-        private static void ScanDirectoryRecursively(string directoryPath, List<string> rateFiles)
+        private static void ScanDirectoryRecursively(string directoryPath, List<string> rateFiles, int currentDepth, int? maxDepth)
         {
             try
             {
                 string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".m4v", ".3gp", ".mpeg", ".mpg" };
+
+                bool isRateFolderAtMaxDepth = false;
 
                 // 检查当前文件夹名是否以rate开头
                 string directoryName = Path.GetFileName(directoryPath);
@@ -121,7 +128,15 @@ namespace VideoRateScanList
                     {
                         rateFiles.Add(directoryPath);
                         Console.WriteLine($"  找到rate文件夹: {directoryName}");
-                        return;
+                        // 如果处于最大深度，标记为需要继续扫描子目录
+                        if (maxDepth.HasValue && currentDepth >= maxDepth.Value)
+                        {
+                            isRateFolderAtMaxDepth = true;
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                 }
 
@@ -152,6 +167,12 @@ namespace VideoRateScanList
                     }
                 }
 
+                // 如果达到最大深度且不是rate文件夹的特殊情况，不再递归
+                if (!isRateFolderAtMaxDepth && maxDepth.HasValue && currentDepth >= maxDepth.Value)
+                {
+                    return;
+                }
+
                 // 递归扫描子目录
                 string[] subdirectories = Directory.GetDirectories(directoryPath);
                 foreach (string subdirectory in subdirectories)
@@ -162,7 +183,7 @@ namespace VideoRateScanList
                         {
                             continue;
                         }
-                        ScanDirectoryRecursively(subdirectory, rateFiles);
+                        ScanDirectoryRecursively(subdirectory, rateFiles, currentDepth + 1, maxDepth);
                     }
                     catch (UnauthorizedAccessException)
                     {
