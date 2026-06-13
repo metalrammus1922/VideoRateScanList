@@ -97,7 +97,7 @@ namespace VideoRateScanList
         {
             try
             {
-                string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".m4v", ".3gp", ".ts", ".mpeg", ".mpg" };
+                string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".m4v", ".3gp", ".mpeg", ".mpg" };
 
                 // 检查当前文件夹名是否以rate开头
                 string directoryName = Path.GetFileName(directoryPath);
@@ -198,9 +198,22 @@ namespace VideoRateScanList
                 "windows",
                 "program files",
                 "program files (x86)",
+                "programdata",
                 "appdata",
+                "local",
+                "locallow",
+                "roaming",
                 "temp",
-                "tmp"
+                "tmp",
+                "perflogs",
+                "recovery",
+                "intel",
+                "msocache",
+                "$windows.~ws",
+                "$windows.~bt",
+                "node_modules",
+                ".git",
+                "packages"
             };
 
             return skipDirectories.Contains(directoryName);
